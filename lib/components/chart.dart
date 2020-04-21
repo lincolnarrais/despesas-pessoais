@@ -27,7 +27,9 @@ class Chart extends StatelessWidget {
       }
 
       return {
-        'day': DateFormat.E().format(weekDay)[0],
+        'day': DateFormat.E('Pt').format(weekDay)[0] +
+            DateFormat.E('pt').format(weekDay)[1] +
+            DateFormat.E('pt').format(weekDay)[2],
         'value': totalSum,
       };
     }).reversed.toList();
@@ -41,6 +43,23 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var _transactionsList = groupedTransactions.map((tr) {
+      return Flexible(
+        fit: FlexFit.tight,
+        child: ChartBar(
+          label: tr['day'],
+          value: tr['value'],
+          percentage: _weekTotalValue == 0
+              ? 0
+              : (tr['value'] as double) / _weekTotalValue,
+        ),
+      );
+    }).toList();
+
+    for (var i = _transactionsList.length - 1; i > 0; i--) {
+      _transactionsList.insert(i, Expanded(child: VerticalDivider()));
+    }
+
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(20),
@@ -48,16 +67,7 @@ class Chart extends StatelessWidget {
         padding: const EdgeInsets.all(10.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround, //spaceEvenly?
-          children: groupedTransactions.map((tr) {
-            return Flexible(
-              fit: FlexFit.tight,
-              child: ChartBar(
-                label: tr['day'],
-                value: tr['value'],
-                percentage: _weekTotalValue == 0 ? 0 : (tr['value'] as double) / _weekTotalValue,
-              ),
-            );
-          }).toList(),
+          children: _transactionsList,
         ),
       ),
     );
