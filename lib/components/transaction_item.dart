@@ -1,18 +1,40 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction.dart';
 
-
-class TransactionItem extends StatelessWidget {
+class TransactionItem extends StatefulWidget {
   final Transaction tr;
   final void Function(String) onRemove;
-  
+
   const TransactionItem({
     Key key,
     @required this.tr,
     @required this.onRemove,
   }) : super(key: key);
 
+  @override
+  _TransactionItemState createState() => _TransactionItemState();
+}
+
+class _TransactionItemState extends State<TransactionItem> {
+  static const colors = [
+    Colors.red,
+    Colors.purple,
+    Colors.orange,
+    Colors.blue,
+    Colors.black,
+  ];
+
+  Color _backGroundColor;
+
+  @override
+  void initState() {
+    super.initState();
+    int i = Random().nextInt(colors.length);
+    _backGroundColor = colors[i];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,33 +46,33 @@ class TransactionItem extends StatelessWidget {
       ),
       child: ListTile(
         leading: CircleAvatar(
+          backgroundColor: _backGroundColor,
           radius: 30,
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: FittedBox(
-              child: Text('R\$ ${tr.value.toStringAsFixed(2)}'),
+              child: Text('R\$ ${widget.tr.value.toStringAsFixed(2)}'),
             ),
           ),
         ),
         title: Text(
-          tr.title,
+          widget.tr.title,
           style: Theme.of(context).textTheme.title,
         ),
         subtitle: Text(
-          DateFormat('d MMM y', 'pt').format(tr.date),
+          DateFormat('d MMM y', 'pt').format(widget.tr.date),
         ),
         trailing: MediaQuery.of(context).size.width > 480
             ? FlatButton.icon(
-                onPressed: () => onRemove(tr.id),
+                onPressed: () => widget.onRemove(widget.tr.id),
                 icon: const Icon(Icons.delete),
                 label: const Text('Excluir'),
                 textColor: Theme.of(context).errorColor,
               )
             : IconButton(
                 icon: Icon(Icons.delete),
-                color: Theme.of(context)
-                    .errorColor, // alterar no main.dart
-                onPressed: () => onRemove(tr.id),
+                color: Theme.of(context).errorColor, // alterar no main.dart
+                onPressed: () => widget.onRemove(widget.tr.id),
               ),
       ),
     );
